@@ -99,7 +99,7 @@ namespace TouhouDesktop
                     toolStripStatusLabel1.Text = $"下载完成{rp_body.Length / 1024 } KB";
 
                     // 读取图片资源
-                    System.Drawing.Image downImage = System.Drawing.Image.FromStream(await rp.Content.ReadAsStreamAsync());
+                    Image downImage = Image.FromStream(await rp.Content.ReadAsStreamAsync());
 
                     // 保存图片 
                     string directory = string.Format(this.directory + @"{0}\", DateTime.Now.ToString("yyyy-MM-dd"));
@@ -178,9 +178,9 @@ namespace TouhouDesktop
         {
 
             // 检查文件夹是否存在
-            if (!System.IO.Directory.Exists(this.directory))
+            if (!Directory.Exists(this.directory))
             {
-                System.IO.Directory.CreateDirectory(this.directory);
+                Directory.CreateDirectory(this.directory);
             }
 
             System.Diagnostics.Process.Start(this.directory);
@@ -289,40 +289,61 @@ namespace TouhouDesktop
             return ImageUrl;
         }
 
-        public void SetWallpaper()
+        public delegate void SetWallpaperDelegate();
+        public async Task SetWallpaper()
         {
+
+
+            toolStripStatusLabel1.Text = "正在下载";
+
             string ImageSavePath = this.directory;
-            //设置墙纸
-            Bitmap bmpWallpaper;
-            WebRequest webreq = WebRequest.Create(GetUrl());
-            //Console.WriteLine(getURL());
-            //Console.ReadLine();
-            WebResponse webres = webreq.GetResponse();
-
             //图片保存路径为相对路径，保存在程序的目录下
-            string strSavePath = ImageSavePath + "\\bing" + DateTime.Now.ToString("yyyy-MM-dd") + ".png";
+            string strSavePath = $"{ImageSavePath}bing{DateTime.Now.ToString("yyyy-MM-dd")}.png";
 
-            using (Stream stream = webres.GetResponseStream())
+            //设置墙纸
+            string imgUrl = await Task.Run(() => GetUrl());
+            using (var client = new HttpClient())
             {
-                bmpWallpaper = (Bitmap)Image.FromStream(stream);
-                //stream.Close();
-                if (!Directory.Exists(ImageSavePath))
+                HttpResponseMessage rp = await client.GetAsync(imgUrl);
+                //Console.WriteLine(getURL());
+                //Console.ReadLine();
+                string rp_body = await rp.Content.ReadAsStringAsync();
+
+                toolStripStatusLabel1.Text = $"下载完成{rp_body.Length / 1024 } KB";
+
+
+
+                using (Stream stream = await rp.Content.ReadAsStreamAsync())
                 {
-                    Directory.CreateDirectory(ImageSavePath);
+                    Image downImage = Image.FromStream(stream);
+                    //stream.Close();
+                    if (!Directory.Exists(ImageSavePath))
+                    {
+                        Directory.CreateDirectory(ImageSavePath);
+                    }
+                    //设置文件名为例：bing2017816.jpg
+
+                    downImage.Save(strSavePath, ImageFormat.Png);
+
+                    downImage.Dispose();
                 }
-                //设置文件名为例：bing2017816.jpg
-                bmpWallpaper.Save(strSavePath, ImageFormat.Png); 
             }
             //保存图片代码到此为止，下面就是
-            
 
-            tabPage3.BackgroundImage = Image.FromFile(strSavePath);
+            // 创建一个图片副本，防止重新下载覆盖图片时，图片被锁定
+            Image openImage = Image.FromFile(strSavePath);
+            Bitmap TempImage = new Bitmap(openImage);
+            openImage.Dispose();
+
+            tabPage3.BackgroundImage = TempImage;
+
             SetWallpaperApi(strSavePath);
         }
 
-        private void Button5_Click(object sender, EventArgs e)
+        private async void Button5_Click(object sender, EventArgs e)
         {
-            SetWallpaper();
+
+            await SetWallpaper();
         }
     }
 }
