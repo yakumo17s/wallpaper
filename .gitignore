@@ -1,0 +1,11 @@
+bin/
+obj/
+Properties/
+packages/
+.vs/
+*.msi
+node_modules/
+publish/
+UpgradeLog.htm
+
+
