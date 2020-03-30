@@ -26,6 +26,9 @@ namespace TouhouDesktop
         private string directory = @"D:\img\";
         private System.Timers.Timer timer;
         const int SPI_GETDESKWALLPAPER = 0x0073;
+        List<string> local_img_path = new List<string>();
+        Thread localImgThread = null;
+
         public Form1()
         {
             InitializeComponent();
@@ -127,7 +130,8 @@ namespace TouhouDesktop
 
                     downImage.Dispose();
 
-                    SetWallpaperApi(directory + fileName);
+                    SetWallpaper(directory + fileName);
+
 
                     WriteLine("获取随机图片结束");
 
@@ -148,9 +152,23 @@ namespace TouhouDesktop
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 
-        public static void SetWallpaperApi(string ImgPath)
+        public static int SetWallpaperApi(string ImgPath)
         {
-            SystemParametersInfo(20, 1, ImgPath, 1);
+            return SystemParametersInfo(20, 1, ImgPath, 1);
+        }
+
+        public delegate void SetWallpaperDelegate();
+        public void SetWallpaper(string ImgPath)
+        {
+            int result = SetWallpaperApi(ImgPath);
+            if (result == 1)
+            {
+                toolStripStatusLabel1.Text = $"{result} 设置成功";
+            }
+            else
+            {
+                toolStripStatusLabel1.Text = $"{result} 设置失败";
+            }
         }
 
         private void menuItemCenter_Click(object sender, System.EventArgs e)
@@ -289,10 +307,9 @@ namespace TouhouDesktop
             return ImageUrl;
         }
 
-        public delegate void SetWallpaperDelegate();
-        public async Task SetWallpaper()
+        public delegate void BingWallpaperDelegate();
+        public async Task BingWallpaper()
         {
-
 
             toolStripStatusLabel1.Text = "正在下载";
 
@@ -337,13 +354,143 @@ namespace TouhouDesktop
 
             tabPage3.BackgroundImage = TempImage;
 
-            SetWallpaperApi(strSavePath);
+            SetWallpaper(strSavePath);
+
         }
 
         private async void Button5_Click(object sender, EventArgs e)
         {
 
-            await SetWallpaper();
+            await BingWallpaper();
         }
+
+        private void TabPage5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void NotifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            // 双击显示或者最小化窗口
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Show();
+                WindowState = FormWindowState.Normal;
+                //notifyIcon1.Visible = false;
+                ShowInTaskbar = true;
+            }
+            else
+            {
+                WindowState = FormWindowState.Minimized;
+                ShowInTaskbar = false;
+            }
+        }
+
+        private void Button7_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+        }
+
+        private void OpenFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+            string img_path = openFileDialog1.FileName;
+
+            SetWallpaper(img_path);
+        }
+
+        private void Button8_Click(object sender, EventArgs e)
+        {
+            string img_folder_path;
+
+
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                // 停止定时器
+                if (!(localImgThread is null) && localImgThread.IsAlive)
+                {
+                    localImgThread.Abort();
+                    localImgThread = null;
+                    toolStripStatusLabel1.Text = "已停止定时修改";
+                    button4.Text = "启动定时修改";
+
+                }
+
+                // 清空已有目录
+                local_img_path.Clear();
+                img_folder_path = folderBrowserDialog1.SelectedPath;
+
+                label1.Text = img_folder_path;
+
+                DirectoryInfo folder = new DirectoryInfo(img_folder_path);
+                foreach (FileInfo file in folder.GetFiles())
+                {
+                    try
+                    {
+                        Image.FromFile(file.FullName);
+                        local_img_path.Add(file.FullName);
+                    }
+                    catch (Exception err)
+                    {
+                        WriteLine($"打开图片失败{file.FullName} {err}");
+                    }
+                }
+
+                label3.Text = $"{local_img_path.Count}张图片";
+
+                WriteLine($"打开了图片 {local_img_path.Count}");
+            };
+            WriteLine("end");
+        }
+
+        public delegate void ChangeWallpaperDelegate();
+        private void ChangeWallpaper(object time)
+        {
+            while (true)
+            {
+                foreach (string img_path in local_img_path)
+                {
+                    Invoke(new SetWallpaperDelegate(() => SetWallpaper(img_path)));
+                    Thread.Sleep(int.Parse(time.ToString()) * 1000);
+                }
+            }
+        }
+
+
+        private void Button9_Click(object sender, EventArgs e)
+        {
+
+
+            // 停止定时器
+            if (!(localImgThread is null) && localImgThread.IsAlive)
+            {
+                localImgThread.Abort();
+                localImgThread = null;
+                toolStripStatusLabel1.Text = "已停止定时修改";
+                button4.Text = "启动定时修改";
+                return;
+            }
+
+            // 启动定时器
+            bool rp = double.TryParse(textBox2.Text, out double time);
+
+            WriteLine($"{rp}:{time}");
+
+            if (rp)
+            {
+                localImgThread = new Thread(new ParameterizedThreadStart(ChangeWallpaper));
+                localImgThread.Start((int)time);
+
+
+                // 文本修改
+                toolStripStatusLabel1.Text = "启动定时修改";
+                button4.Text = "停止定时修改";
+            }
+            else
+            {
+                toolStripStatusLabel1.Text = "时间设置错误";
+            }
+        }
+
+
     }
 }
