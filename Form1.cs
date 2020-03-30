@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -99,22 +102,22 @@ namespace TouhouDesktop
                     System.Drawing.Image downImage = System.Drawing.Image.FromStream(await rp.Content.ReadAsStreamAsync());
 
                     // 保存图片 
-                    string deerory = string.Format(this.directory + @"{0}\", DateTime.Now.ToString("yyyy-MM-dd"));
+                    string directory = string.Format(this.directory + @"{0}\", DateTime.Now.ToString("yyyy-MM-dd"));
 
                     string fileName = string.Format("{0}.png", DateTime.Now.ToString("HHmmssffff"));
 
 
-                    if (!System.IO.Directory.Exists(deerory))
+                    if (!Directory.Exists(directory))
                     {
-                        System.IO.Directory.CreateDirectory(deerory);
+                        Directory.CreateDirectory(directory);
                     }
 
-                    downImage.Save(deerory + fileName);
+                    downImage.Save(directory + fileName);
 
                     // 设置为tab背景
                     try
                     {
-                        tabPage1.BackgroundImage = Image.FromFile(deerory + fileName);
+                        tabPage1.BackgroundImage = Image.FromFile(directory + fileName);
 
                     }
                     catch (Exception err)
@@ -124,8 +127,7 @@ namespace TouhouDesktop
 
                     downImage.Dispose();
 
-
-                    SystemParametersInfo(20, 1, deerory + fileName, 1);
+                    SetWallpaperApi(directory + fileName);
 
                     WriteLine("获取随机图片结束");
 
@@ -141,8 +143,16 @@ namespace TouhouDesktop
             }
         }
 
+
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+        public static void SetWallpaperApi(string ImgPath)
+        {
+            SystemParametersInfo(20, 1, ImgPath, 1);
+        }
+
         private void menuItemCenter_Click(object sender, System.EventArgs e)
         {
             //设置墙纸显示方式
@@ -246,6 +256,73 @@ namespace TouhouDesktop
             // toolStripStatusLabel1.Text = $"下次修改时间：{DateTime.Now + TimeSpan.FromSeconds(timer_interval)}";
 
 
+        }
+
+
+        public static string GetUrl()
+        {
+            string InfoUrl = "http://cn.bing.com/HPImageArchive.aspx?idx=0&n=1";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(InfoUrl);
+            request.Method = "GET";
+            request.ContentType = "text/html;charset=UTF-8";
+            string xmlDoc;
+            //使用using自动注销HttpWebResponse
+            using (HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse())
+            {
+                Stream stream = webResponse.GetResponseStream();
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    xmlDoc = reader.ReadToEnd();
+                }
+            }
+            // 使用正则表达式解析标签（字符串），当然你也可以使用XmlDocument类或XDocument类
+            Regex regex = new Regex("<Url>(?<MyUrl>.*?)</Url>", RegexOptions.IgnoreCase);
+            WriteLine(xmlDoc);
+            MatchCollection collection = regex.Matches(xmlDoc);
+            // 取得匹配项列表
+            string ImageUrl = "http://www.bing.com" + collection[0].Groups["MyUrl"].Value;
+            WriteLine(ImageUrl);
+            //if (true)
+            //{
+            //    ImageUrl = ImageUrl.Replace("1366x768", "1920x1080");
+            //}
+            return ImageUrl;
+        }
+
+        public void SetWallpaper()
+        {
+            string ImageSavePath = this.directory;
+            //设置墙纸
+            Bitmap bmpWallpaper;
+            WebRequest webreq = WebRequest.Create(GetUrl());
+            //Console.WriteLine(getURL());
+            //Console.ReadLine();
+            WebResponse webres = webreq.GetResponse();
+
+            //图片保存路径为相对路径，保存在程序的目录下
+            string strSavePath = ImageSavePath + "\\bing" + DateTime.Now.ToString("yyyy-MM-dd") + ".png";
+
+            using (Stream stream = webres.GetResponseStream())
+            {
+                bmpWallpaper = (Bitmap)Image.FromStream(stream);
+                //stream.Close();
+                if (!Directory.Exists(ImageSavePath))
+                {
+                    Directory.CreateDirectory(ImageSavePath);
+                }
+                //设置文件名为例：bing2017816.jpg
+                bmpWallpaper.Save(strSavePath, ImageFormat.Png); 
+            }
+            //保存图片代码到此为止，下面就是
+            
+
+            tabPage3.BackgroundImage = Image.FromFile(strSavePath);
+            SetWallpaperApi(strSavePath);
+        }
+
+        private void Button5_Click(object sender, EventArgs e)
+        {
+            SetWallpaper();
         }
     }
 }

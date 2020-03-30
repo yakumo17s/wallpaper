@@ -42,9 +42,12 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.button5 = new System.Windows.Forms.Button();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage1
@@ -61,21 +64,21 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(263, 315);
+            this.tabPage1.Size = new System.Drawing.Size(456, 205);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "东方project";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(146, 175);
+            this.textBox1.Location = new System.Drawing.Point(122, 96);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 3;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(146, 216);
+            this.textBox2.Location = new System.Drawing.Point(122, 137);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(38, 21);
             this.textBox2.TabIndex = 6;
@@ -85,7 +88,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 12F);
-            this.label2.Location = new System.Drawing.Point(190, 216);
+            this.label2.Location = new System.Drawing.Point(166, 137);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(24, 16);
             this.label2.TabIndex = 7;
@@ -93,7 +96,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(32, 94);
+            this.button1.Location = new System.Drawing.Point(8, 15);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
@@ -103,7 +106,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(32, 133);
+            this.button2.Location = new System.Drawing.Point(8, 54);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 1;
@@ -113,7 +116,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(32, 214);
+            this.button4.Location = new System.Drawing.Point(8, 135);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(87, 23);
             this.button4.TabIndex = 5;
@@ -123,7 +126,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(32, 173);
+            this.button3.Location = new System.Drawing.Point(8, 94);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(87, 23);
             this.button3.TabIndex = 4;
@@ -135,11 +138,12 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(271, 341);
+            this.tabControl1.Size = new System.Drawing.Size(464, 231);
             this.tabControl1.TabIndex = 8;
             // 
             // tabPage2
@@ -156,9 +160,9 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 319);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 209);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(271, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(464, 22);
             this.statusStrip1.TabIndex = 9;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -167,13 +171,35 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
+            // tabPage3
+            // 
+            this.tabPage3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.tabPage3.Controls.Add(this.button5);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(456, 205);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "bing";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(8, 17);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 1;
+            this.button5.Text = "今日图片";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.Button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.ClientSize = new System.Drawing.Size(271, 341);
+            this.ClientSize = new System.Drawing.Size(464, 231);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.tabControl1);
             this.HelpButton = true;
@@ -187,6 +213,7 @@
             this.tabControl1.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -206,6 +233,8 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Button button5;
     }
 }
 
